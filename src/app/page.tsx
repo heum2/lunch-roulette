@@ -33,8 +33,6 @@ export default function Home() {
         setIsSpinning(false);
 
         // 최종 당첨자 결정
-        // 타깃 인덱스를 참가자 수로 나눈 나머지가 실제 화살표가 가리키는 메뉴 인덱스
-        // 회전 방향이 바뀌었으므로 계산 방식도 변경
         const finalIndex = targetIndex % participants.length;
         const actualWinner = participants[finalIndex];
         setWinner(actualWinner);

@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 점심 룰렛 🍽️
 
-## Getting Started
+점심 메뉴를 고르기 어려울 때 사용하는 룰렛 애플리케이션입니다.
 
-First, run the development server:
+## 주요 기능 ✨
+
+- 메뉴 추가/삭제
+- 룰렛 회전 애니메이션
+- 당첨 메뉴
+- 반응형 디자인
+
+## 스크린샷 📸
+
+### 룰렛 메인 화면
+
+![메인 화면](public/images/main.png)
+
+### 룰렛 회전 중 화면
+
+![룰렛 회전](public/images/spinning.gif)
+
+### 당첨 메뉴 발표 화면
+
+![당첨메뉴 발표](public/images/winner.png)
+
+## 기술 스택 🛠️
+
+- Next.js 14
+- TypeScript
+- Tailwind CSS
+
+## 시작하기 🚀
+
+1. 저장소 클론
+
+```bash
+git clone https://github.com/yourusername/lunch-roulette.git
+cd lunch-roulette
+```
+
+2. 의존성 설치
+
+```bash
+npm install
+# or
+yarn install
+```
+
+3. 개발 서버 실행
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. 브라우저에서 확인
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 사용 방법 📝
 
-## Learn More
+1. 메뉴 추가
 
-To learn more about Next.js, take a look at the following resources:
+   - "추가" 버튼을 클릭하여 메뉴 이름 입력
+   - Enter 키를 눌러 추가
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. 룰렛 실행
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   - "돌려" 버튼을 클릭하여 룰렛 회전 시작
+   - "멈춰" 버튼을 클릭하여 당첨메뉴 선정
 
-## Deploy on Vercel
+3. 결과 확인
+   - 당첨된 메뉴의 이름이 화면에 표시됨
+   - 룰렛이 해당 메뉴 위치에서 멈춤
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 라이선스 📄
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT License

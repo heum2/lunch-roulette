@@ -23,7 +23,7 @@ const Wheel = ({
   useEffect(() => {
     if (participants.length === 0 || !winner) return;
 
-    if (!isSpinning) {
+    if (!isSpinning && spinningState === 'idle') {
       // 현재 회전 각도에서 가장 위에 있는 조각 (0도 위치)의 인덱스 계산
       const sliceAngle = 360 / participants.length;
       const rotationAngle = -participants.indexOf(winner) * sliceAngle;
@@ -35,7 +35,7 @@ const Wheel = ({
         onSelectWinner(actualWinner);
       }
     }
-  }, [isSpinning, participants, winner, onSelectWinner]);
+  }, [isSpinning, spinningState, participants, winner, onSelectWinner]);
 
   if (participants.length === 0) return null;
 
@@ -203,19 +203,14 @@ const Wheel = ({
               style={{
                 left: `${textX}px`,
                 top: `${textY}px`,
-                transform: `translate(-50%, -50%) rotate(${midAngle}deg)`,
-                maxWidth: `${textRadius * 1.5}px`,
+                transform: `translate(-50%, -50%) rotate(${midAngle + 90}deg)`,
                 overflow: 'hidden',
                 textShadow: '1px 1px 2px rgba(0,0,0,0.6)',
                 fontSize: '0.85rem',
                 padding: '2px',
               }}
             >
-              <span
-                style={{ display: 'inline-block', transform: `rotate(90deg)` }}
-              >
-                {participant}
-              </span>
+              {participant}
             </div>
           );
         })}
