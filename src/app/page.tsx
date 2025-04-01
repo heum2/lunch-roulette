@@ -2,20 +2,24 @@
 
 import { useState, useEffect } from 'react';
 
-import Wheel from '@/app/components/Wheel';
+import Wheel from '@/app/components/Wheel'; // Wheel 컴포넌트 다시 사용
+// import WheelSimpleRotate from '@/app/components/WheelSimpleRotate'; // 제거
 
 export default function Home() {
   const [participants, setParticipants] = useState<string[]>([]);
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [newParticipant, setNewParticipant] = useState('');
-  const [spinSpeed, setSpinSpeed] = useState(30); // 초기 속도 더 빠르게
+  // 이전 상태 복원
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [spinSpeed, setSpinSpeed] = useState(30);
   const [spinningState, setSpinningState] = useState<
     'idle' | 'spinning' | 'slowing'
   >('idle');
   const [targetIndex, setTargetIndex] = useState(0);
+  // rotation 상태 제거
 
+  // useEffect 복원 (애니메이션 포함)
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
 
@@ -24,15 +28,12 @@ export default function Home() {
         setCurrentIndex((prev) => prev + 1);
       }, spinSpeed);
     } else if (spinningState === 'slowing') {
-      // 슬로잉 중에는 인터벌을 실행하지 않음
-
-      // 타이머를 통해 슬로잉 애니메이션이 끝난 후 완전히 정지시킴
-      const slowingTime = 3000; // 슬로잉 애니메이션 시간(ms)과 일치해야 함
+      const slowingTime = 3000; // 슬로잉 애니메이션 시간(ms)
       const timer = setTimeout(() => {
         setSpinningState('idle');
         setIsSpinning(false);
 
-        // 최종 당첨자 결정
+        // 최종 당첨자 결정 (targetIndex 기반)
         const finalIndex = targetIndex % participants.length;
         const actualWinner = participants[finalIndex];
         setWinner(actualWinner);
@@ -47,21 +48,19 @@ export default function Home() {
   }, [spinningState, spinSpeed, participants, targetIndex]);
 
   const handleStartSpinning = () => {
-    if (participants.length === 0) return;
+    if (participants.length === 0 || isSpinning) return;
     setSpinningState('spinning');
     setIsSpinning(true);
     setWinner(null);
     setCurrentIndex(0);
-    setSpinSpeed(30); // 초기 속도 빠르게
+    setSpinSpeed(30);
   };
 
   const handleStopSpinning = () => {
     if (!isSpinning || spinningState !== 'spinning') return;
 
-    // 좀 더 많이 회전 후 멈춤
-    const extraRotations = Math.floor(Math.random() * 2) + 2; // 추가로 2~3바퀴 더 돌리기
-
-    // 현재 인덱스에서 랜덤하게 최종 멈춤 위치 계산
+    // 최종 멈춤 위치 계산 (이전 로직 복원)
+    const extraRotations = Math.floor(Math.random() * 2) + 2;
     const randomStopIndex = Math.floor(Math.random() * participants.length);
     const currentRotation = Math.floor(currentIndex / participants.length);
     const targetRotation = currentRotation + extraRotations;
@@ -69,12 +68,10 @@ export default function Home() {
       targetRotation * participants.length + randomStopIndex;
 
     setTargetIndex(finalTargetIndex);
-    setCurrentIndex(finalTargetIndex);
+    // setCurrentIndex(finalTargetIndex); // 슬로잉 애니메이션 위해 제거
     setSpinningState('slowing');
-  };
-
-  const handleSelectWinner = (selectedWinner: string) => {
-    setWinner(selectedWinner);
+    // setIsSpinning(false); // setTimeout에서 처리
+    // setWinner(...); // setTimeout에서 처리
   };
 
   const addParticipant = (e: React.FormEvent) => {
@@ -99,6 +96,7 @@ export default function Home() {
           <h1 className="text-2xl font-bold mb-4">점심 룰렛</h1>
           {participants.length > 0 ? (
             <div className="text-xl font-semibold mb-4">
+              {/* winner는 spinningState가 idle일 때만 표시 */}
               {winner && spinningState === 'idle' ? (
                 <div className="text-primary font-bold text-2xl animate-bounce">
                   당첨: {winner}
@@ -112,13 +110,12 @@ export default function Home() {
           )}
         </div>
 
+        {/* Wheel 컴포넌트 다시 사용 */}
         <Wheel
           participants={participants}
           currentIndex={currentIndex}
-          isSpinning={isSpinning}
-          winner={winner}
-          onSelectWinner={handleSelectWinner}
           spinningState={spinningState}
+          targetIndex={targetIndex}
         />
 
         <form onSubmit={addParticipant} className="flex gap-x-2 w-full">
