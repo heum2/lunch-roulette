@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
-import './globals.css';
-import { cn } from '@/utils/style';
+import '@/app/globals.css';
 
 export const metadata: Metadata = {
   title: '점심 룰렛',
@@ -58,7 +57,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={cn(pretendard.className, 'h-dvh')}>{children}</body>
+      <body className={pretendard.className}>{children}</body>
     </html>
   );
 }

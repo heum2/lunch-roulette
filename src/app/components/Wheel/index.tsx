@@ -1,9 +1,14 @@
 'use client';
 
+import { useEffect, useMemo, useState, useRef } from 'react';
+
+import { CENTER, SIZE, WHEEL_COLORS } from '@/app/components/Wheel/constants';
+import { SpinningState } from '@/app/constants';
+
 interface WheelProps {
   participants: string[];
   currentIndex: number;
-  spinningState: 'idle' | 'spinning' | 'slowing';
+  spinningState: SpinningState;
   targetIndex: number;
 }
 
@@ -13,57 +18,53 @@ const Wheel = ({
   spinningState,
   targetIndex,
 }: WheelProps) => {
+  const [rotationAngle, setRotationAngle] = useState(0);
+  const lastSpinningAngle = useRef(0);
+
+  const sliceAngle = useMemo(
+    () => (participants.length === 1 ? 360 : 360 / participants.length),
+    [participants.length],
+  );
+
+  useEffect(() => {
+    if (spinningState === SpinningState.SPINNING) {
+      const angle = currentIndex * sliceAngle;
+      setRotationAngle(angle);
+      lastSpinningAngle.current = angle;
+    } else if (spinningState === SpinningState.SLOWING) {
+      const currentAngle = lastSpinningAngle.current;
+
+      const winnerIndex = targetIndex % participants.length;
+      const finalPointerAngle = winnerIndex * sliceAngle + sliceAngle / 2;
+
+      const k = Math.floor((currentAngle + finalPointerAngle) / 360) + 1;
+      const finalAngle = -finalPointerAngle + 360 * k;
+
+      setRotationAngle(finalAngle);
+    }
+  }, [
+    participants.length,
+    currentIndex,
+    spinningState,
+    targetIndex,
+    sliceAngle,
+  ]);
+
   if (participants.length === 0) return null;
-
-  const colors = [
-    '#FF5252', // 빨강
-    '#4285F4', // 파랑
-    '#0F9D58', // 초록
-    '#F4B400', // 노랑
-    '#DB4437', // 다크 레드
-    '#673AB7', // 보라
-    '#FF6D00', // 주황
-    '#00BCD4', // 청록
-    '#9C27B0', // 진한 보라
-    '#3F51B5', // 남색
-    '#8BC34A', // 라임
-    '#FFEB3B', // 밝은 노랑
-  ];
-
-  const size = 300;
-  const center = size / 2;
-  const sliceAngle =
-    participants.length === 1 ? 360 : 360 / participants.length;
-
-  let rotationAngle;
-  if (spinningState === 'spinning') {
-    rotationAngle = currentIndex * sliceAngle;
-  } else {
-    const winnerIndex = targetIndex % participants.length;
-
-    const finalPositionAngle = winnerIndex * sliceAngle + sliceAngle / 2;
-
-    const fullRotations = Math.max(
-      0,
-      Math.floor(targetIndex / participants.length),
-    );
-
-    rotationAngle = fullRotations * 360 + finalPositionAngle;
-  }
 
   return (
     <div
       className="relative mx-auto my-4"
-      style={{ width: size, height: size }}
+      style={{ width: SIZE, height: SIZE }}
     >
       <div
         className="absolute w-full h-full rounded-full overflow-hidden"
         style={{
           transform: `rotate(${rotationAngle}deg)`,
           transition:
-            spinningState === 'spinning'
+            spinningState === SpinningState.SPINNING
               ? 'transform 0.1s linear'
-              : spinningState === 'slowing'
+              : spinningState === SpinningState.SLOWING
               ? 'transform 3s cubic-bezier(0.25, 0.1, 0.25, 1.0)'
               : 'none',
           borderWidth: '4px',
@@ -71,13 +72,13 @@ const Wheel = ({
           borderStyle: 'solid',
           boxShadow: '0 0 15px rgba(0,0,0,0.2)',
           backgroundColor:
-            participants.length === 1 ? colors[0] : 'transparent',
+            participants.length === 1 ? WHEEL_COLORS[0] : 'transparent',
         }}
       >
-        <svg width={size} height={size} className="absolute inset-0">
+        <svg width={SIZE} height={SIZE} className="absolute inset-0">
           <defs>
             {participants.map((_, index) => {
-              const colorIndex = index % colors.length;
+              const colorIndex = index % WHEEL_COLORS.length;
               return (
                 <linearGradient
                   key={`grad-${index}`}
@@ -89,12 +90,12 @@ const Wheel = ({
                 >
                   <stop
                     offset="0%"
-                    stopColor={colors[colorIndex]}
+                    stopColor={WHEEL_COLORS[colorIndex]}
                     stopOpacity="1"
                   />
                   <stop
                     offset="100%"
-                    stopColor={colors[colorIndex]}
+                    stopColor={WHEEL_COLORS[colorIndex]}
                     stopOpacity="0.7"
                   />
                 </linearGradient>
@@ -104,9 +105,9 @@ const Wheel = ({
 
           {participants.length === 1 ? (
             <circle
-              cx={center}
-              cy={center}
-              r={center}
+              cx={CENTER}
+              cy={CENTER}
+              r={CENTER}
               fill={`url(#gradient-0)`}
               stroke="#fff"
               strokeWidth="1"
@@ -116,20 +117,20 @@ const Wheel = ({
               const startAngle = index * sliceAngle;
               const endAngle = (index + 1) * sliceAngle;
 
-              const startRad = (startAngle * Math.PI) / 180;
-              const endRad = (endAngle * Math.PI) / 180;
+              const startRadTrig = ((90 - startAngle) * Math.PI) / 180;
+              const endRadTrig = ((90 - endAngle) * Math.PI) / 180;
 
-              const x1 = center + Math.cos(startRad) * center;
-              const y1 = center + Math.sin(startRad) * center;
-              const x2 = center + Math.cos(endRad) * center;
-              const y2 = center + Math.sin(endRad) * center;
+              const x1 = CENTER + Math.cos(startRadTrig) * CENTER;
+              const y1 = CENTER - Math.sin(startRadTrig) * CENTER;
+              const x2 = CENTER + Math.cos(endRadTrig) * CENTER;
+              const y2 = CENTER - Math.sin(endRadTrig) * CENTER;
 
               const largeArcFlag = sliceAngle > 180 ? 1 : 0;
 
               const d = [
-                `M ${center} ${center}`,
+                `M ${CENTER} ${CENTER}`,
                 `L ${x1} ${y1}`,
-                `A ${center} ${center} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+                `A ${CENTER} ${CENTER} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
                 'Z',
               ].join(' ');
 
@@ -167,11 +168,11 @@ const Wheel = ({
 
           const startAngle = index * sliceAngle;
           const midAngle = startAngle + sliceAngle / 2;
-          const textRadius = center * 0.65;
+          const textRadius = CENTER * 0.65;
 
-          const textRad = (midAngle * Math.PI) / 180;
-          const textX = center + Math.cos(textRad) * textRadius;
-          const textY = center + Math.sin(textRad) * textRadius;
+          const midAngleRadCss = (midAngle * Math.PI) / 180;
+          const textX = CENTER + Math.sin(midAngleRadCss) * textRadius;
+          const textY = CENTER - Math.cos(midAngleRadCss) * textRadius;
 
           return (
             <div
@@ -197,7 +198,7 @@ const Wheel = ({
         className="absolute"
         style={{
           top: '-10px',
-          left: `${center}px`,
+          left: `${CENTER}px`,
           transform: 'translateX(-50%)',
           zIndex: 10,
         }}

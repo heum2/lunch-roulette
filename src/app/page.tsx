@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 
-import Wheel from '@/app/components/Wheel'; // Wheel 컴포넌트 다시 사용
-// import WheelSimpleRotate from '@/app/components/WheelSimpleRotate'; // 제거
+import Wheel from '@/app/components/Wheel';
+
+import { SpinningState } from '@/app/constants';
 
 export default function Home() {
   const [participants, setParticipants] = useState<string[]>([]);
@@ -13,29 +14,24 @@ export default function Home() {
   // 이전 상태 복원
   const [currentIndex, setCurrentIndex] = useState(0);
   const [spinSpeed, setSpinSpeed] = useState(30);
-  const [spinningState, setSpinningState] = useState<
-    'idle' | 'spinning' | 'slowing'
-  >('idle');
+  const [spinningState, setSpinningState] = useState(SpinningState.IDLE);
   const [targetIndex, setTargetIndex] = useState(0);
-  // rotation 상태 제거
 
-  // useEffect 복원 (애니메이션 포함)
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
 
-    if (spinningState === 'spinning') {
+    if (spinningState === SpinningState.SPINNING) {
       interval = setInterval(() => {
         setCurrentIndex((prev) => prev + 1);
       }, spinSpeed);
-    } else if (spinningState === 'slowing') {
-      const slowingTime = 3000; // 슬로잉 애니메이션 시간(ms)
+    } else if (spinningState === SpinningState.SLOWING) {
+      const slowingTime = 3000;
       const timer = setTimeout(() => {
-        setSpinningState('idle');
+        setSpinningState(SpinningState.IDLE);
         setIsSpinning(false);
 
-        // 최종 당첨자 결정 (targetIndex 기반)
-        const finalIndex = targetIndex % participants.length;
-        const actualWinner = participants[finalIndex];
+        console.log({ targetIndex });
+        const actualWinner = participants[targetIndex];
         setWinner(actualWinner);
       }, slowingTime);
 
@@ -49,29 +45,19 @@ export default function Home() {
 
   const handleStartSpinning = () => {
     if (participants.length === 0 || isSpinning) return;
-    setSpinningState('spinning');
+    setSpinningState(SpinningState.SPINNING);
     setIsSpinning(true);
     setWinner(null);
-    setCurrentIndex(0);
     setSpinSpeed(30);
   };
 
   const handleStopSpinning = () => {
-    if (!isSpinning || spinningState !== 'spinning') return;
+    if (!isSpinning || spinningState !== SpinningState.SPINNING) return;
 
-    // 최종 멈춤 위치 계산 (이전 로직 복원)
-    const extraRotations = Math.floor(Math.random() * 2) + 2;
     const randomStopIndex = Math.floor(Math.random() * participants.length);
-    const currentRotation = Math.floor(currentIndex / participants.length);
-    const targetRotation = currentRotation + extraRotations;
-    const finalTargetIndex =
-      targetRotation * participants.length + randomStopIndex;
-
-    setTargetIndex(finalTargetIndex);
-    // setCurrentIndex(finalTargetIndex); // 슬로잉 애니메이션 위해 제거
-    setSpinningState('slowing');
-    // setIsSpinning(false); // setTimeout에서 처리
-    // setWinner(...); // setTimeout에서 처리
+    const finalTargetIndex = participants.length + randomStopIndex;
+    setTargetIndex(finalTargetIndex % participants.length);
+    setSpinningState(SpinningState.SLOWING);
   };
 
   const addParticipant = (e: React.FormEvent) => {
@@ -96,8 +82,7 @@ export default function Home() {
           <h1 className="text-2xl font-bold mb-4">점심 룰렛</h1>
           {participants.length > 0 ? (
             <div className="text-xl font-semibold mb-4">
-              {/* winner는 spinningState가 idle일 때만 표시 */}
-              {winner && spinningState === 'idle' ? (
+              {winner && spinningState === SpinningState.IDLE ? (
                 <div className="text-primary font-bold text-2xl animate-bounce">
                   당첨: {winner}
                 </div>
@@ -110,7 +95,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* Wheel 컴포넌트 다시 사용 */}
         <Wheel
           participants={participants}
           currentIndex={currentIndex}
@@ -161,7 +145,7 @@ export default function Home() {
           <button
             className="btn btn-active flex-1"
             onClick={handleStopSpinning}
-            disabled={!isSpinning || spinningState !== 'spinning'}
+            disabled={!isSpinning || spinningState !== SpinningState.SPINNING}
           >
             멈춰
           </button>
