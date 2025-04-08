@@ -11,7 +11,6 @@ export default function Home() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
   const [newParticipant, setNewParticipant] = useState('');
-  // 이전 상태 복원
   const [currentIndex, setCurrentIndex] = useState(0);
   const [spinSpeed, setSpinSpeed] = useState(30);
   const [spinningState, setSpinningState] = useState(SpinningState.IDLE);
