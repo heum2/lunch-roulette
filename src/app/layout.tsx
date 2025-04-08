@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: '점심시간 메뉴를 고르기 힘들 때 사용하는 룰렛',
 };
 
-export const pretendard = localFont({
+const pretendard = localFont({
   src: [
     {
       path: '../../public/fonts/Pretendard-Thin.woff',
