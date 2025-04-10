@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Wheel from '@/app/components/Wheel';
 
 import { SpinningState } from '@/app/constants';
+import { createClient } from '@/utils/supabase/client';
 
 export default function Home() {
   const [participants, setParticipants] = useState<string[]>([]);
@@ -15,6 +16,8 @@ export default function Home() {
   const [spinSpeed, setSpinSpeed] = useState(30);
   const [spinningState, setSpinningState] = useState(SpinningState.IDLE);
   const [targetIndex, setTargetIndex] = useState(0);
+
+  const supabase = createClient();
 
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
@@ -73,6 +76,18 @@ export default function Home() {
   const removeParticipant = (index: number) => {
     setParticipants(participants.filter((_, i) => i !== index));
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error('Error fetching user', error);
+      } else {
+        console.log('User data:', data);
+      }
+    };
+    fetchUser();
+  }, [supabase.auth]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
