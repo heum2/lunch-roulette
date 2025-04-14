@@ -22,8 +22,8 @@ const Login = () => {
 
   return (
     <div className="hero min-h-screen bg-base-200">
-      <div className="hero-content text-center">
-        <button className="btn " onClick={handleSignInWithGoogle}>
+      <div className="hero-content">
+        <button className="btn btn-primary" onClick={handleSignInWithGoogle}>
           <Image
             src="/google-logo.svg"
             alt="Google logo"

@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 import Wheel from '@/app/components/Wheel';
 
 import { SpinningState } from '@/app/constants';
+
 import { createClient } from '@/utils/supabase/client';
 
 export default function Home() {
@@ -17,33 +19,9 @@ export default function Home() {
   const [spinningState, setSpinningState] = useState(SpinningState.IDLE);
   const [targetIndex, setTargetIndex] = useState(0);
 
+  const router = useRouter();
+
   const supabase = createClient();
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout | undefined;
-
-    if (spinningState === SpinningState.SPINNING) {
-      interval = setInterval(() => {
-        setCurrentIndex((prev) => prev + 1);
-      }, spinSpeed);
-    } else if (spinningState === SpinningState.SLOWING) {
-      const slowingTime = 3000;
-      const timer = setTimeout(() => {
-        setSpinningState(SpinningState.IDLE);
-        setIsSpinning(false);
-
-        console.log({ targetIndex });
-        const actualWinner = participants[targetIndex];
-        setWinner(actualWinner);
-      }, slowingTime);
-
-      return () => clearTimeout(timer);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [spinningState, spinSpeed, participants, targetIndex]);
 
   const handleStartSpinning = () => {
     if (participants.length === 0 || isSpinning) return;
@@ -78,16 +56,45 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) {
+    let interval: NodeJS.Timeout | undefined;
+
+    if (spinningState === SpinningState.SPINNING) {
+      interval = setInterval(() => {
+        setCurrentIndex((prev) => prev + 1);
+      }, spinSpeed);
+    } else if (spinningState === SpinningState.SLOWING) {
+      const slowingTime = 3000;
+      const timer = setTimeout(() => {
+        setSpinningState(SpinningState.IDLE);
+        setIsSpinning(false);
+
+        console.log({ targetIndex });
+        const actualWinner = participants[targetIndex];
+        setWinner(actualWinner);
+      }, slowingTime);
+
+      return () => clearTimeout(timer);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [spinningState, spinSpeed, participants, targetIndex]);
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const { error } = await supabase.auth.getUser();
+        if (error) {
+          throw error;
+        }
+      } catch (error) {
         console.error('Error fetching user', error);
-      } else {
-        console.log('User data:', data);
+        router.replace('/login');
       }
     };
-    fetchUser();
-  }, [supabase.auth]);
+    fetchSession();
+  }, [supabase.auth, router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
