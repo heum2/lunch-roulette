@@ -1,36 +1,23 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/server';
 
 import Loulette from '@/app/components/Loulette';
 
-import { createClient } from '@/utils/supabase/client';
+const Home = async () => {
+  const supabase = await createClient();
 
-function Home() {
-  const router = useRouter();
-  const supabase = createClient();
+  const { data } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const { error } = await supabase.auth.getUser();
-        if (error) {
-          throw error;
-        }
-      } catch (error) {
-        console.error('Error fetching user', error);
-        router.replace('/login');
-      }
-    };
-    fetchSession();
-  }, [supabase.auth, router]);
+  if (!data.user) {
+    redirect('/login');
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <Loulette />
     </div>
   );
-}
+};
 
 export default Home;
