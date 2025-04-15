@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 
 import { createClient } from '@/utils/supabase/server';
 
+import Cursor from '@/app/components/Cursor';
 import Loulette from '@/app/components/Loulette';
 
 const Home = async () => {
@@ -14,9 +15,9 @@ const Home = async () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <Cursor>
       <Loulette />
-    </div>
+    </Cursor>
   );
 };
 
