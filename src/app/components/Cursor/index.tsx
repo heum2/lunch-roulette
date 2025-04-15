@@ -12,6 +12,8 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 
 import { createClient } from '@/utils/supabase/client';
 
+import { ChannelEvent } from '@/app/components/Cursor/constants';
+
 const CHANNEL = 'cursor-tracking-p5ethx7';
 
 type CursorPosition = {
@@ -48,7 +50,7 @@ const Cursor = ({ children }: PropsWithChildren) => {
 
       channelRef.current.send({
         type: 'broadcast',
-        event: 'cursor_move',
+        event: ChannelEvent.CURSOR_MOVED,
         payload: {
           userId: userId.current,
           x: position.x,
@@ -136,23 +138,27 @@ const Cursor = ({ children }: PropsWithChildren) => {
           });
         });
 
-        channel.on('broadcast', { event: 'cursor_move' }, (payload) => {
-          if (payload.payload.userId === userId.current) return;
+        channel.on(
+          'broadcast',
+          { event: ChannelEvent.CURSOR_MOVED },
+          (payload) => {
+            if (payload.payload.userId === userId.current) return;
 
-          const { userId: cursorUserId, x, y } = payload.payload;
+            const { userId: cursorUserId, x, y } = payload.payload;
 
-          setUserCursors((prevCursors) => {
-            if (!prevCursors[cursorUserId]) return prevCursors;
+            setUserCursors((prevCursors) => {
+              if (!prevCursors[cursorUserId]) return prevCursors;
 
-            return {
-              ...prevCursors,
-              [cursorUserId]: {
-                ...prevCursors[cursorUserId],
-                position: { x, y },
-              },
-            };
-          });
-        });
+              return {
+                ...prevCursors,
+                [cursorUserId]: {
+                  ...prevCursors[cursorUserId],
+                  position: { x, y },
+                },
+              };
+            });
+          },
+        );
 
         channel.subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
