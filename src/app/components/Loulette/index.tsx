@@ -1,13 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 
 import Wheel from '@/app/components/Wheel';
 
 import { SpinningState } from '@/app/constants';
-
-import { createClient } from '@/utils/supabase/client';
 
 function Loulette() {
   const [participants, setParticipants] = useState<string[]>([]);
@@ -18,10 +15,6 @@ function Loulette() {
   const [spinSpeed, setSpinSpeed] = useState(30);
   const [spinningState, setSpinningState] = useState(SpinningState.IDLE);
   const [targetIndex, setTargetIndex] = useState(0);
-
-  const router = useRouter();
-
-  const supabase = createClient();
 
   const handleStartSpinning = () => {
     if (participants.length === 0 || isSpinning) return;
@@ -80,21 +73,6 @@ function Loulette() {
     };
   }, [spinningState, spinSpeed, participants, targetIndex]);
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const { error } = await supabase.auth.getUser();
-        if (error) {
-          throw error;
-        }
-      } catch (error) {
-        console.error('Error fetching user', error);
-        router.replace('/login');
-      }
-    };
-    fetchSession();
-  }, [supabase.auth, router]);
-
   return (
     <div className="w-full flex flex-col gap items-center justify-center gap-y-5 max-w-md">
       <div className="text-center">
@@ -139,14 +117,13 @@ function Loulette() {
           <h2 className="font-semibold">목록</h2>
           <div className="flex flex-wrap gap-2">
             {participants.map((participant, index) => (
-              <div key={index} className="badge badge-primary gap-1 min-w-12">
+              <div
+                key={index}
+                className="badge badge-primary gap-1 min-w-12 cursor-pointer"
+                onClick={() => removeParticipant(index)}
+              >
                 {participant}
-                <button
-                  onClick={() => removeParticipant(index)}
-                  className="btn btn-xs btn-ghost"
-                >
-                  ×
-                </button>
+                <button className="btn btn-xs btn-ghost">×</button>
               </div>
             ))}
           </div>

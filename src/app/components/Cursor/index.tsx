@@ -85,7 +85,6 @@ const Cursor = ({ children }: PropsWithChildren) => {
           return;
         }
 
-        console.log(data.user);
         userId.current = data.user.id;
 
         usernameRef.current = data.user.user_metadata.name;
@@ -209,7 +208,7 @@ const Cursor = ({ children }: PropsWithChildren) => {
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
-                fill="none"
+                fill="white"
                 stroke="currentColor"
                 strokeWidth="1"
                 strokeLinecap="round"
@@ -219,7 +218,6 @@ const Cursor = ({ children }: PropsWithChildren) => {
               </svg>
             </div>
 
-            {/* Username label */}
             <div className="relative left-3 bottom-1 flex items-center gap-2">
               <Image
                 className="btn-circle"
