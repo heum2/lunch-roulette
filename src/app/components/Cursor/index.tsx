@@ -33,11 +33,6 @@ type UserCursors = {
 const Cursor = ({ children }: PropsWithChildren) => {
   const [isConnected, setIsConnected] = useState(false);
   const [userCursors, setUserCursors] = useState<UserCursors>({});
-  const [localCursorPosition, setLocalCursorPosition] =
-    useState<CursorPosition>({
-      x: 0,
-      y: 0,
-    });
 
   const userId = useRef<string>('');
 
@@ -75,8 +70,6 @@ const Cursor = ({ children }: PropsWithChildren) => {
       const relativeY = ((e.clientY - rect.top) / rect.height) * 100;
 
       const newPosition = { x: relativeX, y: relativeY };
-
-      setLocalCursorPosition(newPosition);
 
       broadcastCursorPosition(newPosition);
     },
@@ -195,35 +188,9 @@ const Cursor = ({ children }: PropsWithChildren) => {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col items-center justify-center min-h-screen p-4 cursor-none"
+      className="flex flex-col items-center justify-center min-h-screen p-4"
       onMouseMove={handleMouseMove}
     >
-      <div
-        className="absolute pointer-events-none flex flex-col items-start"
-        style={{
-          left: `${localCursorPosition.x}%`,
-          top: `${localCursorPosition.y}%`,
-          zIndex: 110, // Higher than other cursors
-          transform: 'translate(-50%, -50%)',
-        }}
-      >
-        <div>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z" />
-          </svg>
-        </div>
-      </div>
-
       {Object.entries(userCursors).map(
         ([id, { position, username, image }]) => (
           <div
@@ -244,7 +211,7 @@ const Cursor = ({ children }: PropsWithChildren) => {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >

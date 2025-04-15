@@ -25,7 +25,7 @@ const Login = () => {
       <div className="hero-content">
         <button className="btn btn-primary" onClick={handleSignInWithGoogle}>
           <Image
-            src="/google-logo.svg"
+            src="/icons/google-logo.svg"
             alt="Google logo"
             width={20}
             height={20}
