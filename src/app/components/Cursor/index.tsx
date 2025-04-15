@@ -39,7 +39,6 @@ const Cursor = ({ children }: PropsWithChildren) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const isInitialSetup = useRef(true);
-  const usernameRef = useRef<string>('');
 
   const supabase = createClient();
 
@@ -86,8 +85,6 @@ const Cursor = ({ children }: PropsWithChildren) => {
         }
 
         userId.current = data.user.id;
-
-        usernameRef.current = data.user.user_metadata.name;
 
         const channel = supabase.channel(CHANNEL);
         channelRef.current = channel;
@@ -161,7 +158,7 @@ const Cursor = ({ children }: PropsWithChildren) => {
           if (status === 'SUBSCRIBED') {
             await channel.track({
               user_id: userId.current,
-              username: usernameRef.current,
+              username: data.user.user_metadata.name,
               image: data.user.user_metadata.avatar_url,
               online_at: new Date().getTime(),
             });
