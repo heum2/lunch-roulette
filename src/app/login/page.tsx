@@ -10,6 +10,18 @@ const Login = () => {
   const supabase = createClient();
   const router = useRouter();
 
+  const getURL = () => {
+    let url =
+      process?.env?.NEXT_PUBLIC_SITE_URL ??
+      process?.env?.NEXT_PUBLIC_VERCEL_URL ??
+      'http://localhost:3000/';
+
+    url = url.startsWith('http') ? url : `https://${url}`;
+
+    url = url.endsWith('/') ? url : `${url}/`;
+    return url;
+  };
+
   const handleSignInWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -18,6 +30,7 @@ const Login = () => {
           access_type: 'offline',
           prompt: 'consent',
         },
+        redirectTo: getURL(),
       },
     });
 
