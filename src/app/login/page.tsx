@@ -1,24 +1,46 @@
 'use client';
 
-import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+
+import { createClient } from '@/utils/supabase/client';
+import { useEffect } from 'react';
 
 const Login = () => {
   const supabase = createClient();
+  const router = useRouter();
 
   const handleSignInWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: {
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
     });
 
     if (error) {
       console.error('Error signing in with Google', error);
     }
 
-    if (data) {
-      console.log('Signed in with Google', data);
+    if (data.url) {
+      router.push(data.url);
     }
   };
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+
+      if (data.session) {
+        router.push('/');
+      }
+    };
+
+    checkSession();
+  }, []);
 
   return (
     <div className="hero min-h-screen bg-base-200">
