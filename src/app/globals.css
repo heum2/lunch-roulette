@@ -1,12 +1,10 @@
 @import 'tailwindcss';
-@plugin 'daisyui';
+@plugin 'daisyui' {
+  themes: light --default, dark --prefersdark, caramellatte;
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-body {
-  background-color: #f0f0f0;
 }
